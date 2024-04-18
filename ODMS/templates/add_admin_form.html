@@ -1,0 +1,28 @@
+{% extends 'header.html' %}
+{% block content %}
+<br>
+<blockquote class="blockquote text-center">
+  <h3>Add User</h1>
+</blockquote>
+<div class = "form_div">
+    <form method="POST">
+        <div class="form-group">
+          <label for="name">Lecturer's Name:</label>
+          <input type="text" class="form-control" id="name" name="name" pattern = "[a-zA-Z0-9- _.]{1,}" title = "Letters, numbers, dots, underscores and spaces only" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Lecturer's Email:</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <br>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+  {% for message in messages %}
+      <p class='alert alert-primary'>{{ message }}</p>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+</div>
+{% endblock %}

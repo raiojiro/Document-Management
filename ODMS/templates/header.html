@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+
+<header>
+
+<nav class="navbar navbar-light" style="background-color:#ffe6e6;">
+<img style="margin:15px;"src="{{ url_for('static', filename='img/dummy_logo.png') }}" alt="Dummy logo transparent" width="15%">
+<div class="navibar">
+    {% if session['admin'] != 1 %}
+    <a href="{{ url_for('main') }}">Home</a>
+    <a href="{{ url_for('settings') }}">Account Settings</a>
+    <a href="{{ url_for('logout') }}">Log Out</a>
+    {% else %}
+    <a href="{{ url_for('home_admin') }}">Home</a>
+    <a href="{{ url_for('add_admin') }}">Add User</a>
+    <a href="{{ url_for('settings') }}">Account Settings</a>
+    <a href="{{ url_for('logout') }}">Log Out</a>
+    {% endif %}
+</div>
+</nav>
+
+</header>
+<body>
+    {% block content %}{% endblock %}
+</body>
+</html>

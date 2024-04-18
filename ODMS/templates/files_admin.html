@@ -1,0 +1,54 @@
+{% extends 'header.html' %}
+{% block content %}
+{% set crumbPath = request.path.replace("/admin/", "") %}
+{% set bCrumb = request.path.split('/') %}
+    <nav aria-label="breadcrumb">
+        <ol style = "background-color:#b3dcfa;padding: 0.5%" class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page">Path:&nbsp;</li>
+            {% set cList = [] %}
+            {% for crumbs in bCrumb[3:] if crumbs != "main" %}
+            {% set tmp = cList.append(crumbs) %}
+           <li class="breadcrumb-item" aria-current="page"><a href = "{{ url_for('files_admin', path = cList | join('/'))}}">{{ crumbs }}</a></li>
+            {% endfor %}
+          </ol>
+    </nav>
+<br>
+    <table class="table" style="margin-top:50px;">
+        <tr>
+            <th>Files</th>
+            <th style = "width: 20%;">Upload Date</th>
+            <th style = "width: 20%;"></th>
+            <th style = "width: 20%;"></th>
+        </tr>
+        {% for file in files %}
+        <tr>
+            <td>
+            <a href="{{ (request.path + '/' if request.path != '/' else '') + file }}">
+                {{ file }}
+            </a>
+            </td>
+            {% set file_path = request.path[13:] + '/' + file %}
+            {% if file_path in dates %}
+            <td>{{ dates[file_path][1] }}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            <td>
+                <form method="POST">
+                    <input type='hidden' id = "filename" name="filename" value="{{ file }}"">
+                    <button type="submit" id = "submit" name = "submit" value="download">Download</button>
+                </form>         
+            </td>
+            
+            <td>
+            <form method="POST">
+                <input type='hidden' id = "filename" name="filename" value="{{ file }}"">
+                <button type="submit" id = "submit" name = "submit" onclick = ' return confirm("Are you sure?")' value="del_file">Delete</button>
+            </form>
+            </td>
+        
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

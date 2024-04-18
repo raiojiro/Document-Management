@@ -1,0 +1,157 @@
+{% extends "header.html" %}
+{% block content %}
+{% if request.path == '/' %}
+
+<br>
+<button type="button" class="btn btn-primary" style = "margin-left:0.5%;" data-toggle="modal" data-target="#myModal">New Semester</button>
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">New Semester</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form method="POST">
+                
+                <label for="semester">Semester:</label>
+                <div class = "form-inline">
+                <select id = "semester_month" name = "semester_month" class = "form-control" style = "width:40%; margin-right: 5%;" required>
+                    <option value = "JAN">JAN</option>
+                    <option value = "MAY">MAY</option>
+                    <option value = "AUG">AUG</option>
+                </select>
+                    <input type = "text" class = "form-control" style = "width:50%;" id = "semester_year" name = "semester_year" placeholder="Semester Year: YYYY" pattern = "[0-9]{4}" title = "Please follow the year format: yyyy." required>
+                </div>
+                <label for="sub1">Courses:</label> 
+                <input type="text" class="form-control" id="sub1" name="sub1" pattern = "[a-zA-Z]{3}[0-9]{4}" title = "The course code contains 3 letters and 4 numbers" placeholder="Minimum one course required"> 
+                <input type="text" class="form-control" id="sub2" name="sub2"pattern = "[a-zA-Z]{3}[0-9]{4}" title = "The course code contains 3 letters and 4 numbers"> 
+                <input type="text" class="form-control" id="sub3" name="sub3"pattern = "[a-zA-Z]{3}[0-9]{4}" title = "The course code contains 3 letters and 4 numbers"> 
+                <input type="text" class="form-control" id="sub4" name="sub4"pattern = "[a-zA-Z]{3}[0-9]{4}" title = "The course code contains 3 letters and 4 numbers">
+                <br> 
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div></div></div></div>
+
+          <table class="table table-bordered" style="margin-top:30px; border-color : black;" id="table">
+            <thead class="table-active">
+                <tr>
+                    <th style="width: 20%">Semester</th>
+                    <th style="width: 30%">Subjects</th>
+                    <th style="width: 20%">Categories</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set files = semester_sort(files) %}
+                {% for sem in files %}
+                {% set subjects = list_path(sem) %}
+                {% set fileSize = filesNum (sem) %}
+                    <tr>
+                    <td rowspan = {{ fileSize if fileSize != 0 else 1}}>
+                        <a href = "{{ sem }}">
+                            {{ sem }}
+                        </a>
+                    </td>
+                    </tr>
+                    {% for sub in subjects %}
+                    {% set subpath = sem + '/' + sub %}
+                    {% set categories = list_path(subpath) %}
+                    {% set fileSize = filesNum(subpath) %}
+                    <tr>
+                    <td rowspan = {{fileSize if fileSize != 0 else 1}}>
+                        <a href = "{{ subpath }}">
+                        {{ sub }}
+                    </a>
+                </td>
+            </tr>
+                    {% for category in categories %}
+                    <tr>                
+                    <td>
+                        <a href = "{{ subpath + '/' + category }}">
+                        {{category}}
+                    </a>
+                </td>
+                    </tr> 
+                {% endfor %}{% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+{% else %}
+{% set bCrumb = request.path.split('/') %}
+    <nav aria-label="breadcrumb">
+        <ol style = "background-color:#b3dcfa;padding: 0.5%" class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page">Path:&nbsp; <a href = "/main">{{ session['name'] }}</a></li>
+            {% set cList = [] %}
+            {% for crumbs in bCrumb[1:] if crumbs != "main" %}
+            {% set tmp = cList.append(crumbs) %}
+           <li class="breadcrumb-item" aria-current="page"><a href = "{{ url_for('main', path = cList | join('/'))}}">{{ crumbs }}</a></li>
+            {% endfor %}
+          </ol>
+    </nav>
+    <button type="button" style="margin:0.5%;" data-toggle="modal" data-target="#myModal">Create New Folder</button>
+    
+    <div class="modal" id="myModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">New Folder</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <label for="folder_name">Name:</label> 
+                    <input type="text" class="form-control" id="folder_name" name="folder_name">
+                    <br>
+                    <button type="submit" class="btn btn-primary" name = "submit" value = "new_folder" >Submit</button>
+                </form>
+              </div></div></div></div>
+    <form action="{{ url_for('handle_upload') }}" method="POST" enctype="multipart/form-data">
+    <input type="file" class="form-control-file" style = "margin:0.5%;" id="fileup" name="fileup" onchange="form.submit()">
+    <input type="hidden" id="path" name="path" value= "{{ request.path }}">
+    </form>
+    <table class="table" style="margin-top:50px;">
+        <thead class="table-active"">
+        <tr>
+            <th>Files</th>
+            <th style = "width: 20%;">Upload Date</th>
+            <th style = "width: 20%;"></th>
+            <th style = "width: 20%;"></th>
+        </tr>
+    </thead>
+        {% for file in files %}
+        <tr>
+            <td>
+            <a href="{{ (request.path + '/' if request.path != '/' else '') + file }}">
+                {{ file }}
+            </a>
+        </td>
+        {% set file_path = session['name'] + request.path + '/' + file %}
+        {% if file_path in dates %}
+        <td>{{ dates[file_path][1] }}</td>
+        {% else %}
+        <td></td>
+        {% endif %}
+        
+            <td>
+                <form method="POST">
+                    <input type='hidden' id = "filename" name="filename" value="{{ file }}"">
+                    <button type="submit" id = "submit" name = "submit" value="download">Download</button>
+                </form>         
+            </td>
+            
+            <td>
+            <form method="POST">
+                <input type='hidden' id = "filename" name="filename" value="{{ file }}"">
+                <button type="submit" id = "submit" name = "submit" onclick = ' return confirm("Are you sure?")' value="del_file">Delete</button>
+            </form>
+            </td>
+            
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% endif %}
+{% endblock %}
+
+

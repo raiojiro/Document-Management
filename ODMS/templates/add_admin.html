@@ -1,0 +1,35 @@
+{% extends 'header.html' %} {% block content %}
+<br />
+<blockquote class="blockquote text-center">
+    <h3>Lists of Users</h3>
+</blockquote>
+
+<button type="button" class="btn btn-primary" style="margin: 0.5%;" onclick="window.location.href='{{ url_for( 'add_admin_form') }}';">Add a User</button>
+{% for user in users %}
+<form method="POST" id="{{ user[0] }}">
+  <input type="hidden" name="hidden_email" value="{{ user[2] }}" />
+  <input type="hidden" name="hidden_name" value="{{ user[0] }}" />
+</form>
+{% endfor %}
+
+<table class="table" id="users">
+    <tr>
+        <th>Lecturer</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th></th>
+        <th></th>
+    </tr>
+    {% for user in users %}
+        <tr>
+            <td>{{ user[0] }}</td>
+            <td>{{ user[1] }}</td>
+            <td>{{ user[2] }}</td>
+            <td>
+                <button form="{{ user[0] }}" type="submit" class="btn btn-primary btn-sm" name="submit" value="editUser">Edit</button>
+            </td>
+            <td><button form="{{ user[0] }}" type="submit" class="btn btn-primary btn-sm" onclick="return confirm('Are you sure you want to remove {{ user[0] }} and all of their uploaded files?')" name="submit" value="delete">Delete</button></td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}

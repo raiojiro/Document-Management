@@ -1,0 +1,34 @@
+{% extends "header.html" %}
+{% block content %}
+
+    <div class="form_div">
+    <h3>Account Settings</h3><br>
+  <form action="{{ url_for('handle_settings') }}" method="POST">
+    <div class="form-group">
+      <label for="name">Name:</label>
+      <input type="text" class="form-control" id="name" name="name" value="{{ result[0] }}"pattern = "[a-zA-Z0-9- _.]{1,}" title = "Letters, numbers, dots, underscores and spaces only" required>
+    </div>
+    <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" class="form-control" id="username" name="username" value={{ result[1] }} required>
+      </div>
+    <div class="form-group">
+        <label for="">Email:</label>
+        <input type="email" class="form-control" id="email" name="email" value={{ result[2] }} required>
+    </div>
+    <div class="form-group">
+      <label for="pwd">New Password:</label>
+      <input type="password" class="form-control" id="pwd" name="password" placeholder = "Only required for password change." minlength = "8">
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  {% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+      <p class='alert alert-danger'>{{ message }}</p>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+</div>
+{% endblock %}

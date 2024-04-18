@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function show(){
+    var x = document.getElementById("table");
+    if (x.style.display == "none"){
+    x.style.display="table";
+    }
+    else {
+        x.style.display = "none";
+    }
+    }
+    </script>
+</head>
+
+
+<header>
+
+<nav class="navbar navbar-light" style="background-color:#ffe6e6;">
+<img style="margin:15px;"src="{{ url_for('static', filename='img/dummy_logo.png') }}" alt="dummy logo transparent"  width="15%">
+<form class="input-group" style = "width: 50%;" action = {{ url_for ("search") }}>
+<input type="text" class="form-control"  id="keyword" name="keyword"  placeholder="Search..">
+<button type="submit" class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+  </svg></button>
+</form>
+<div class="navibar">
+    <a href="{{ url_for('home_admin') }}">Home</a>
+    <a href="{{ url_for('add_admin') }}">Add User</a>
+    <a href="{{ url_for('settings') }}">Account Settings</a>
+    <a href="{{ url_for('logout') }}">Log Out</a>
+</nav>
+
+</header>
+<body>
+<button type = "button" class = "btn btn-primary" style="margin:0.5%" onclick ="show()">Show/Hide Table</button>
+<table class="table table-bordered" style="margin-top:30px;" id="table">
+    <thead class="table-active">
+        <tr>
+            <th style="width: 30%">Lecturers</th>
+            <th style="width: 20%">Semester</th>
+            <th style="width: 30%">Subjects</th>
+            <th style="width: 20%">Categories</th>
+        </tr>
+    </thead>
+    <tbody>   
+        {% for file in files %}
+        {% if file not in semesters %}
+        {% set semesters = list_path(file) %}
+        {% elif file in semesters %}
+        {% set semesters = semesters[file] %}
+        {% endif %}
+        {% set semesters = semester_sort(semesters) %}
+        {% set fileSize = filesNum(file) %}
+        <tr>
+            <td rowspan = {{ fileSize if fileSize != 0 else 1}}>
+                <a>
+                    {{ file }}
+                </a>
+            </td>
+            
+        </tr>
+            {% for sem in semesters %}
+            {% set subjects = list_path(file + '/' + sem) %}
+            {% set fileSize = filesNum (file + '/' + sem) %}
+            <tr>
+            <td rowspan = {{ fileSize if fileSize != 0 else 1}}>
+                <a>
+                    {{ sem }}
+                </a>
+            </td>
+            </tr>
+            {% for sub in subjects %}
+            {% set subpath = file + '/' + sem + '/' + sub %}
+            {% set categories = list_path(subpath) %}
+            {% set fileSize = filesNum(subpath) %}
+            <tr>
+            <td rowspan = {{fileSize if fileSize != 0 else 1}}>
+            <a>
+                {{ sub }}
+            </a>
+        </td>
+    </tr>
+    
+            {% for category in categories %}
+            <tr>                
+            <td>
+                 {% if fileEmpty (subpath + "/" + category) == False %}
+                <a href = "{{ request.path + '/' + 'files/' + subpath + '/' + category }}">
+                {{category}}
+            </a>
+            {% else %}
+            <a>{{ category }}</a>
+            {% endif %}
+        </td>
+            </tr> 
+            {% endfor %}
+        {% endfor %}{% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+</body>
+</html>
